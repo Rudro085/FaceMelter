@@ -27,8 +27,12 @@ FaceMelterAudioProcessorEditor::FaceMelterAudioProcessorEditor (FaceMelterAudioP
     volumeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
     addAndMakeVisible(volumeSlider);
 
+    crushSlider.setSliderStyle(juce::Slider::Rotary);
+    crushSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    addAndMakeVisible(crushSlider);
+
     // Add labels
-    distortionLabel.setText("Distortion", juce::dontSendNotification);
+    distortionLabel.setText("Drive", juce::dontSendNotification);
     distortionLabel.attachToComponent(&distortionSlider, false);
     addAndMakeVisible(distortionLabel);
 
@@ -39,6 +43,10 @@ FaceMelterAudioProcessorEditor::FaceMelterAudioProcessorEditor (FaceMelterAudioP
     volumeLabel.setText("Volume", juce::dontSendNotification);
     volumeLabel.attachToComponent(&volumeSlider, false);
     addAndMakeVisible(volumeLabel);
+
+    crushLabel.setText("Crush", juce::dontSendNotification);
+    //crushLabel.attachToComponent(&crushSlider, false);
+    addAndMakeVisible(crushLabel);
 
     addAndMakeVisible(ilevelL);
     addAndMakeVisible(ilevelR);
@@ -52,7 +60,7 @@ FaceMelterAudioProcessorEditor::FaceMelterAudioProcessorEditor (FaceMelterAudioP
     distortionAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.getAPVTS(), "distortion", distortionSlider));
     toneAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.getAPVTS(), "tone", toneSlider));
     volumeAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.getAPVTS(), "volume", volumeSlider));
-
+    crushAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.getAPVTS(), "crush", crushSlider));
     startTimerHz(24);
 }
 
@@ -84,9 +92,12 @@ void FaceMelterAudioProcessorEditor::paint (juce::Graphics& g)
 
 void FaceMelterAudioProcessorEditor::resized()
 {
-    distortionSlider.setBounds(50, 100, 100, 100);
-    toneSlider.setBounds(150, 100, 100, 100);
-    volumeSlider.setBounds(250, 100, 100, 100);
+    distortionSlider.setBounds(50, 50, 100, 100);
+    toneSlider.setBounds(150, 50, 100, 100);
+    volumeSlider.setBounds(250, 50, 100, 100);
+    crushSlider.setBounds(150, 150, 100, 100);
+    crushLabel.setBounds(180, 260, 100, 20);
+
     ilevelL.setBounds(5, 10, 5, 300 - 20);
     ilevelR.setBounds(12, 10, 5, 300 - 20);
     olevel.setBounds(400 - 10, 10, 5, 300 - 20);

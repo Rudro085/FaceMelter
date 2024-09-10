@@ -24,7 +24,8 @@ FaceMelterAudioProcessor::FaceMelterAudioProcessor()
         {
             std::make_unique<juce::AudioParameterFloat>("distortion", "Distortion", 0.0f, 1.0f, 0.5f),
             std::make_unique<juce::AudioParameterFloat>("tone", "Tone", 0.0f, 1.0f, 0.5f),
-            std::make_unique<juce::AudioParameterFloat>("volume", "Volume", 0.0f, 1.0f, 0.5f)
+            std::make_unique<juce::AudioParameterFloat>("volume", "Volume", 0.0f, 1.0f, 0.5f),
+            std::make_unique<juce::AudioParameterFloat>("crush","Crush",0.0f,1.0f,0.0f)
         })
     
 #endif
@@ -110,9 +111,12 @@ void FaceMelterAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 
     filter1.prepare(spec);
     filter2.prepare(spec);
+    crushFilter.prepare(spec);
     auto coefficients = juce::dsp::IIR::Coefficients<float>::makeLowPass(sampleRate, 17000.0f);
     filter1.coefficients = coefficients; // Apply coefficients to the filter
     filter2.coefficients = coefficients;
+    coefficients = juce::dsp::IIR::Coefficients<float>::makeLowPass(sampleRate, 10000.0f);
+    crushFilter.coefficients = coefficients;
 
     ilevelL.reset(sampleRate, 0.5);
     ilevelR.reset(sampleRate, 0.5);
@@ -161,6 +165,8 @@ void FaceMelterAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     float distortionValue = *apvts.getRawParameterValue("distortion");
     float toneValue = *apvts.getRawParameterValue("tone");
     float volumeValue = *apvts.getRawParameterValue("volume");
+    float crushValue = *apvts.getRawParameterValue("crush");
+    
     Ws.setParam(distortionValue, toneValue, volumeValue, isOsEnabled);
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -184,10 +190,15 @@ void FaceMelterAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         Ws.process(block);
     }
     juce::dsp::ProcessContextReplacing<float> context(block);
-
+    if (!(crushValue == 0.0)) {
+        crush.setCrushLevel(crushValue);
+        crush.process(block);
+        crushFilter.process(context);
+    }
     // Apply the filter to the buffer
     filter1.process(context);
     filter2.process(context);
+
 
 
     for (int channel = 0; channel < block.getNumChannels(); ++channel)

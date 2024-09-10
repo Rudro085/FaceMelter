@@ -32,10 +32,12 @@ private:
     juce::Slider distortionSlider;
     juce::Slider toneSlider;
     juce::Slider volumeSlider;
+    juce::Slider crushSlider;
 
     juce::Label distortionLabel;
     juce::Label toneLabel;
     juce::Label volumeLabel;
+    juce::Label crushLabel;
     //juce::TextButton oversampleButton;
 
     //void buttonClicked(juce::Button* button) override;
@@ -43,6 +45,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> distortionAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> toneAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> volumeAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> crushAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FaceMelterAudioProcessorEditor)
 };
