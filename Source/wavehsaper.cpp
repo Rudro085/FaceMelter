@@ -5,9 +5,7 @@
 
 
 void Waveshaper::setParam(float dist, float tone, float volume, bool osEnabled) {
-    if (osEnabled) {
-        T = 1. / (8. * sample_rate);
-    }
+    isOsEnabled = osEnabled;
     Rd = std::powf(10., 2. * dist - 2.) * 100000.;
     Rt = 1500. + std::powf(10., 1. * tone - 1) * 100000.;
     Volume = volume;
@@ -37,6 +35,9 @@ void Waveshaper::prepare(double SampleRate, int SamplePerBlock) {
     samplePerBlock = SamplePerBlock;
     sample_rate = SampleRate;
     T = 1. / sample_rate;
+    OsProcessor.initProcessing(samplePerBlock);
+    OsProcessor.reset();
+
     setParam(0.5, 0.5, 0.5, false);
     V2_prev = 4.50002888780806;
     Vc1_prev = -4.500028886551527;
@@ -65,7 +66,7 @@ void Waveshaper::prepare(double SampleRate, int SamplePerBlock) {
 
 
 // The solve method
-float Waveshaper::solve(float Vin) {
+float Waveshaper::solveInputFilter(float Vin) {
     // Input filter
     double V2 = (R3 * V2_prev * gc1 * gc2 * gr2 + R3 * V2_prev * gc2 + V2_prev * gc1 * gc2 - Vc1_prev + Vin +
         Vref * gc1 * gr2 - gc1 * ic1_prev) /
@@ -102,8 +103,17 @@ float Waveshaper::solve(float Vin) {
     Vc7_prev = V3 - V4 - R7 * ic7_prev;
     V4_prev = V4;
 
+    return V4;
+
+    
+
+    
+}
+
+
+float Waveshaper::solveWaveshaper(float V4) {
     // Waveshaper
-    double V5 = V4;
+    float V5 = V4;
     if (V4 <= -1.7) {
         V5 = -1.0;
     }
@@ -118,7 +128,10 @@ float Waveshaper::solve(float Vin) {
     else if (V4 > 1.1) {
         V5 = 1.0;
     }
+    return V5;
+}
 
+float Waveshaper::solveOutputFilter(float V5) {
     // Tone filter stage
     double V6 = (R11 * V5 * gc9 + R11 * V5 * gr13 - R11 * V5_prev * gc9 + R11 * V6_prev * gc9 + V5 * gc10 * gc9 +
         V5 * gc10 * gr13 + V5 - V5_prev * gc10 * gc9 + V6_prev * gc10 * gc9 - Vc10_prev - gc10 * ic10_prev) /
@@ -139,14 +152,46 @@ float Waveshaper::solve(float Vin) {
     Vc12_prev += gc12 * (ic11_prev + ic11_prev);
     ic11_prev = ic11_prev;
 
-    return Vout*Volume/2.;
+    return Vout * Volume / 2.;
 }
+
 
 void Waveshaper::process(juce::dsp::AudioBlock<float>& block) {
 
     for (int sample = 0;sample < block.getNumSamples();++sample) {
         float x = (block.getSample(0, sample) + block.getSample(1, sample)) / 2.0;
-        float y = solve(x);
+        float y = solveInputFilter(x);
+        block.setSample(0, sample, y);
+        block.setSample(1, sample, y);
+    }
+
+    juce::dsp::AudioBlock<float> osBlock = OsProcessor.processSamplesUp(block);
+
+    if (isOsEnabled){
+        for (int sample = 0;sample < osBlock.getNumSamples();++sample) {
+            float x = (osBlock.getSample(0, sample) + osBlock.getSample(1, sample)) / 2.0;
+            float y = solveWaveshaper(x);
+            osBlock.setSample(0, sample, y);
+            osBlock.setSample(1, sample, y);
+        }
+        OsProcessor.processSamplesDown(block);
+
+    }
+    else {
+        for (int sample = 0;sample < block.getNumSamples();++sample) {
+            float x = (block.getSample(0, sample) + block.getSample(1, sample)) / 2.0;
+            float y = solveWaveshaper(x);
+            block.setSample(0, sample, y);
+            block.setSample(1, sample, y);
+        }
+    }
+
+
+    
+
+    for (int sample = 0;sample < block.getNumSamples();++sample) {
+        float x = (block.getSample(0, sample) + block.getSample(1, sample)) / 2.0;
+        float y = solveOutputFilter(x);
         block.setSample(0, sample, y);
         block.setSample(1, sample, y);
     }

@@ -53,8 +53,9 @@ public:
     //==============================================================================
     Waveshaper Ws;
     bool isBypassed = false;
-    bool isOsEnabled = false;
-    juce::dsp::Oversampling<float> OsProcessor;
+    bool isOsEnabled = true;
+    juce::dsp::IIR::Filter<float> filter1,filter2;
+    
     juce::AudioProcessorValueTreeState& getAPVTS() { return apvts; }
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;

@@ -15,7 +15,7 @@ namespace Gui
 		{
 			auto bounds = getLocalBounds().toFloat();
 
-			g.setColour(juce::Colours::burlywood);
+			g.setColour(juce::Colours::antiquewhite);
 			g.fillRoundedRectangle(bounds, 5.f);
 
 			g.setColour(juce::Colours::sandybrown.withBrightness(0.4f));

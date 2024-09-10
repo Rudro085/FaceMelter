@@ -25,10 +25,11 @@ FaceMelterAudioProcessor::FaceMelterAudioProcessor()
             std::make_unique<juce::AudioParameterFloat>("distortion", "Distortion", 0.0f, 1.0f, 0.5f),
             std::make_unique<juce::AudioParameterFloat>("tone", "Tone", 0.0f, 1.0f, 0.5f),
             std::make_unique<juce::AudioParameterFloat>("volume", "Volume", 0.0f, 1.0f, 0.5f)
-        }),
-    OsProcessor(2, 3, juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true, false)
+        })
+    
 #endif
 {
+    
 }
 
 FaceMelterAudioProcessor::~FaceMelterAudioProcessor()
@@ -101,8 +102,18 @@ void FaceMelterAudioProcessor::changeProgramName (int index, const juce::String&
 void FaceMelterAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     Ws.prepare(sampleRate, samplesPerBlock);
-    OsProcessor.initProcessing(samplesPerBlock);
-    OsProcessor.reset();
+    
+    juce::dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = getTotalNumOutputChannels();
+
+    filter1.prepare(spec);
+    filter2.prepare(spec);
+    auto coefficients = juce::dsp::IIR::Coefficients<float>::makeLowPass(sampleRate, 17000.0f);
+    filter1.coefficients = coefficients; // Apply coefficients to the filter
+    filter2.coefficients = coefficients;
+
     ilevelL.reset(sampleRate, 0.5);
     ilevelR.reset(sampleRate, 0.5);
     olevel.reset(sampleRate, 0.5);
@@ -170,20 +181,18 @@ void FaceMelterAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     juce::dsp::AudioBlock<float> block(buffer);
 
     if (isBypassed == false) {
-        if (isOsEnabled == false)
-            Ws.process(block);
-        else {
-            juce::dsp::AudioBlock<float> osBlock = OsProcessor.processSamplesUp(block);
-            Ws.process(osBlock);
-            OsProcessor.processSamplesDown(block);
-
-        }
+        Ws.process(block);
     }
+    juce::dsp::ProcessContextReplacing<float> context(block);
+
+    // Apply the filter to the buffer
+    filter1.process(context);
+    filter2.process(context);
 
 
     for (int channel = 0; channel < block.getNumChannels(); ++channel)
     {
-        auto* channelData = block.getChannelPointer(channel);
+        auto* channelData = block.getChannelPointer(1);
         for (int sample = 0;sample < block.getNumSamples();++sample) {
             channelData[sample] = block.getSample(channel, sample);
         }

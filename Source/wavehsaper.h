@@ -16,7 +16,7 @@
 class Waveshaper{
 public:
     // Constructor
-    Waveshaper() {
+    Waveshaper():OsProcessor(2, 3, juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true, false) {
         V2_prev = Vc1_prev = ic1_prev = V3_prev = Vc5_prev = ic5_prev = 0.0;
         Vc6_prev = ic6_prev = V3_diff_prev = V4_prev = Vc7_prev = ic7_prev = 0.0;
         V5_prev = V6_prev = Vc10_prev = ic10_prev = Vc11_prev = Vc12_prev = ic11_prev = 0.0;
@@ -27,9 +27,13 @@ public:
 
 private:
 
-    float solve(float Vin);
+    float solveInputFilter(float Vin);
+    float solveWaveshaper(float V4);
+    float solveOutputFilter(float v5);
     float T,sample_rate,Volume;
     int samplePerBlock;
+    juce::dsp::Oversampling<float> OsProcessor;
+    bool isOsEnabled = false;
     // State variables
     float V2_prev, Vc1_prev, ic1_prev, V3_prev, Vc5_prev, ic5_prev;
     float Vc6_prev, ic6_prev, V3_diff_prev, V4_prev, Vc7_prev, ic7_prev;
