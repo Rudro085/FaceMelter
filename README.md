@@ -11,7 +11,9 @@
   
 ## Installation
 
-Download Windows vst3 files here: https://github.com/Rudro085/FaceMelter/releases/tag/v1.0.0
+1. Download Windows vst3 files here: https://github.com/Rudro085/FaceMelter/releases/tag/v1.0.1
+2. Copy the vst3 file into "C:\Program Files\Common Files\VST3" folder.
+3. Open your favourite DAW and scan for new plugin.
 
 ## Screenshot
 
