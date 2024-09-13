@@ -38,6 +38,7 @@ private:
     juce::Label toneLabel;
     juce::Label volumeLabel;
     juce::Label crushLabel;
+    juce::Label myLabel;
     //juce::TextButton oversampleButton;
 
     //void buttonClicked(juce::Button* button) override;

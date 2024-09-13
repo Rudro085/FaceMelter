@@ -16,6 +16,8 @@
     <FILE id="ooRSNL" name="crusher.cpp" compile="1" resource="0" file="Source/crusher.cpp"/>
     <FILE id="bWrp8g" name="crusher.h" compile="0" resource="0" file="Source/crusher.h"/>
     <FILE id="IFyVOo" name="levelMeter.h" compile="0" resource="0" file="Source/levelMeter.h"/>
+    <FILE id="lhbEKd" name="LookAndFeel.cpp" compile="1" resource="0" file="Source/LookAndFeel.cpp"/>
+    <FILE id="SGbUnA" name="LookAndFeel.h" compile="0" resource="0" file="Source/LookAndFeel.h"/>
     <FILE id="KxDPUQ" name="wavehsaper.cpp" compile="1" resource="0" file="Source/wavehsaper.cpp"/>
     <FILE id="cdhtyz" name="wavehsaper.h" compile="0" resource="0" file="Source/wavehsaper.h"/>
   </MAINGROUP>

@@ -15,10 +15,10 @@ namespace Gui
 		{
 			auto bounds = getLocalBounds().toFloat();
 
-			g.setColour(juce::Colours::antiquewhite);
+			g.setColour(juce::Colours::grey);
 			g.fillRoundedRectangle(bounds, 5.f);
 
-			g.setColour(juce::Colours::sandybrown.withBrightness(0.4f));
+			g.setColour(juce::Colours::antiquewhite);
 			const auto scaledX = juce::jmap(level, -60.f, 6.f, 0.f, static_cast<float>(getHeight()));
 			g.fillRoundedRectangle(bounds.removeFromBottom(scaledX), 5.f);
 		}

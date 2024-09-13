@@ -8,6 +8,8 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "LookAndFeel.h"
+
 
 //==============================================================================
 FaceMelterAudioProcessorEditor::FaceMelterAudioProcessorEditor (FaceMelterAudioProcessor& p)
@@ -15,20 +17,24 @@ FaceMelterAudioProcessorEditor::FaceMelterAudioProcessorEditor (FaceMelterAudioP
 {
 
     setSize(400, 300);
-    distortionSlider.setSliderStyle(juce::Slider::Rotary);
+    distortionSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     distortionSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    distortionSlider.setLookAndFeel(RotaryKnobLookAndFeel::get());
     addAndMakeVisible(distortionSlider);
 
-    toneSlider.setSliderStyle(juce::Slider::Rotary);
+    toneSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     toneSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    toneSlider.setLookAndFeel(RotaryKnobLookAndFeel::get());
     addAndMakeVisible(toneSlider);
 
-    volumeSlider.setSliderStyle(juce::Slider::Rotary);
+    volumeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     volumeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    volumeSlider.setLookAndFeel(RotaryKnobLookAndFeel::get());
     addAndMakeVisible(volumeSlider);
 
-    crushSlider.setSliderStyle(juce::Slider::Rotary);
+    crushSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     crushSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
+    crushSlider.setLookAndFeel(RotaryKnobLookAndFeel::get());
     addAndMakeVisible(crushSlider);
 
     // Add labels
@@ -47,6 +53,9 @@ FaceMelterAudioProcessorEditor::FaceMelterAudioProcessorEditor (FaceMelterAudioP
     crushLabel.setText("Crush", juce::dontSendNotification);
     //crushLabel.attachToComponent(&crushSlider, false);
     addAndMakeVisible(crushLabel);
+
+    myLabel.setText("RudroHasanDSP", juce::dontSendNotification);
+    addAndMakeVisible(myLabel);
 
     addAndMakeVisible(ilevelL);
     addAndMakeVisible(ilevelR);
@@ -86,7 +95,7 @@ void FaceMelterAudioProcessorEditor::timerCallback() {
 void FaceMelterAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (juce::Colours::darkkhaki);
+    g.fillAll (juce::Colours::darkgrey.withBrightness(0.2));
 
 }
 
@@ -97,6 +106,7 @@ void FaceMelterAudioProcessorEditor::resized()
     volumeSlider.setBounds(250, 50, 100, 100);
     crushSlider.setBounds(150, 150, 100, 100);
     crushLabel.setBounds(180, 260, 100, 20);
+    myLabel.setBounds(270, 270, 100, 20);
 
     ilevelL.setBounds(5, 10, 5, 300 - 20);
     ilevelR.setBounds(12, 10, 5, 300 - 20);
